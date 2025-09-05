@@ -3,8 +3,8 @@ import subprocess
 import sys
 
 def open_emotion_detector():
-    root.destroy()  # close the box window
-    # Run the emotion detector script
+    root.destroy()  
+   
     subprocess.run([sys.executable, "emotion_detector.py"])
 
 root = tk.Tk()
@@ -18,3 +18,4 @@ button = tk.Button(root, text="Click Me!", font=("Arial", 14), bg="pink", comman
 button.pack(pady=20)
 
 root.mainloop()
+
