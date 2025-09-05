@@ -4,12 +4,11 @@ import random
 
 cap = cv2.VideoCapture(0)
 
-# Get frame dimensions
+
 ret, frame_test = cap.read()
 frame_width = frame_test.shape[1]
 frame_height = frame_test.shape[0]
 
-# Light festive colors (BGR)
 pastel_colors = [
     (203, 192, 255),  # Pink
     (255, 192, 203),  # Peach
@@ -22,12 +21,11 @@ pastel_colors = [
     (0, 0, 255)       # Red
 ]
 
-# Balloon zones to avoid center face
+
 LEFT_ZONE = (50, frame_width//2 - 100)
 RIGHT_ZONE = (frame_width//2 + 100, frame_width - 50)
 num_balloons_per_side = 5
 
-# Function to create balloons without overlap
 def create_side_balloons(zone_start, zone_end, count, existing_balloons):
     balloons = []
     attempts = 0
@@ -45,23 +43,22 @@ def create_side_balloons(zone_start, zone_end, count, existing_balloons):
         attempts += 1
     return balloons
 
-# Create initial balloons
 balloons = []
 balloons += create_side_balloons(*LEFT_ZONE, num_balloons_per_side, balloons)
 balloons += create_side_balloons(*RIGHT_ZONE, num_balloons_per_side, balloons)
 
-# Function to draw realistic balloons
+
 def draw_realistic_balloon(frame, balloon):
-    # Balloon body
+    
     cv2.ellipse(frame,
                 (balloon["x"], balloon["y"]),
                 (20, 30), 0, 0, 360,
                 balloon["color"], -1)
-    # Highlight for 3D effect
+  
     highlight_x = balloon["x"] - 7
     highlight_y = balloon["y"] - 10
     cv2.circle(frame, (highlight_x, highlight_y), 5, (255, 255, 255), -1)
-    # String
+  
     cv2.line(frame,
              (balloon["x"], balloon["y"] + 30),
              (balloon["x"], balloon["y"] + 60),
@@ -120,7 +117,7 @@ while True:
         # Move upward
         balloon["y"] -= 5
 
-        # Respawn without overlapping
+        
         if balloon["y"] < -50:
             side_zone = LEFT_ZONE if balloon["x"] < frame_width//2 else RIGHT_ZONE
             new_balloons = create_side_balloons(*side_zone, 1, balloons)
@@ -153,7 +150,7 @@ from PIL import Image, ImageSequence
 import urllib.request
 import io
 
-# ---------------- Load GIF ----------------
+#load GIF
 url = "https://media.tenor.com/WMM8Yjt8BUsAAAAC/happy-teachers-day-teachers-day.gif"
 with urllib.request.urlopen(url) as response:
     gif_bytes = io.BytesIO(response.read())
@@ -161,19 +158,18 @@ with urllib.request.urlopen(url) as response:
 gif = Image.open(gif_bytes)
 gif_frames = []
 
-# Resize frames and convert to OpenCV format
 for frame in ImageSequence.Iterator(gif):
     frame = frame.convert("RGB")
-    frame = frame.resize((400, 200))  # Width x Height for bottom overlay
+    frame = frame.resize((400, 200))  
     cv_frame = cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
     gif_frames.append(cv_frame)
 
-# ---------------- Affirmation Frame ----------------
+
 height, width = 700, 1000
 affirmation_frame = np.zeros((height, width, 3), dtype=np.uint8)
 affirmation_frame[:] = (255, 228, 225)  # Misty pink
 
-# Teacher's Day Text (smaller font)
+# Teacher's Day Text 
 cv2.putText(affirmation_frame,
             "HAPPY TEACHER'S DAY ",
             org=(50, 100),
@@ -182,7 +178,7 @@ cv2.putText(affirmation_frame,
             color=(0, 0, 255),
             thickness=3)
 
-# Personalized message (smaller font)
+
 message_lines = [
     "Dear Hibhayasmine l,",
     "Happy Teacher's Day, Hibhayasmine! ",
@@ -201,9 +197,9 @@ for line in message_lines:
                 fontScale=0.8,  # reduced from 1
                 color=(75, 0, 130),  # Indigo
                 thickness=2)
-    y_pos += 45  # adjusted spacing for smaller font
+    y_pos += 45  
 
-# ---------------- Display with GIF ----------------
+
 frame_idx = 0
 num_gif_frames = len(gif_frames)
 
@@ -213,19 +209,19 @@ cv2.setWindowProperty("A Special Message", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_F
 while True:
     display_frame = affirmation_frame.copy()
 
-    # Overlay GIF frame at bottom center
+
     gif_frame = gif_frames[frame_idx]
     gh, gw, _ = gif_frame.shape
     x_offset = (width - gw) // 2
-    y_offset = height - gh - 20  # 20px margin from bottom
+    y_offset = height - gh - 20 
 
     display_frame[y_offset:y_offset+gh, x_offset:x_offset+gw] = gif_frame
 
     cv2.imshow("A Special Message", display_frame)
 
-    frame_idx = (frame_idx + 1) % num_gif_frames  # Loop GIF
+    frame_idx = (frame_idx + 1) % num_gif_frames  
 
-    if cv2.waitKey(100) & 0xFF == ord("q"):  # Adjust delay for GIF speed
-        break
+    if cv2.waitKey(100) & 0xFF == ord("q"):  
 
 cv2.destroyAllWindows()
+
